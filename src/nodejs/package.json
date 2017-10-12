@@ -1,0 +1,28 @@
+{
+  "name": "nodejs",
+  "version": "1.0.0",
+  "description": "Sample express application",
+  "main": "src/",
+  "scripts": {
+    "lint": "eslint \"src/**\"",
+    "pretest": "npm run lint",
+    "test": "mocha \"src/**/*.spec.js\"",
+    "integrationtest": "cross-env NODE_ENV=production npm test",
+    "start": "node src/"
+  },
+  "author": "Florian Schinagl <fs@think-clean.de>",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.1"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "cross-env": "^5.0.5",
+    "eslint": "^4.8.0",
+    "eslint-config-airbnb-base": "^12.0.2",
+    "eslint-plugin-import": "^2.7.0",
+    "mocha": "^4.0.1",
+    "supertest": "^3.0.0"
+  }
+}
