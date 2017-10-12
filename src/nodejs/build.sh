@@ -1,5 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 npm install
 npm test
-npm prune --production
