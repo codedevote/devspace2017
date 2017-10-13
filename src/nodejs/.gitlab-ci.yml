@@ -1,0 +1,33 @@
+artifacts:
+  ARTIFACTS: "."
+
+stages:
+  - build
+  - build_image
+
+build_job:
+  stage: build
+  tags:
+    - docker
+  image: node:8.6.0-alpine
+  before_script:
+    - npm -v
+  script:
+    - chmod +x build.sh
+    - ./build.sh
+  artifacts:
+    - $ARTIFACTS
+
+build_image_job:
+  stage: build_image
+  tags:
+    - docker
+  image: docker:17.06.2-ce
+  before_script:
+    - docker info
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID .
+    - docker tag $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID $CI_REGISTRY_IMAGE:latest
+    - docker push $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID
+    - docker push $CI_REGISTRY_IMAGE:latest
