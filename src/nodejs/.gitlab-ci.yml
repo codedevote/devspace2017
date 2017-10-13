@@ -1,4 +1,4 @@
-artifacts:
+variables:
   ARTIFACTS: "."
 
 stages:
