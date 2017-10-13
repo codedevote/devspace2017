@@ -1,0 +1,42 @@
+variables:
+  ARTIFACTS: "./artifacts"
+  GIT_SSL_NO_VERIFY: "1"    # you normally SHOULD NOT do this
+  RANCHER_URL: "http://192.168.33.10"
+
+stages:
+  - build
+  - build_image
+
+build_job:
+  image: microsoft/dotnet:2.0.0-sdk
+  stage: build
+  tags:
+    - docker
+  before_script:
+    - dotnet --version
+  script:
+    - chmod +x build.sh
+    - ./build.sh
+  artifacts:
+    paths:
+      - $ARTIFACTS
+      
+build_image_job:
+  image: docker:17.06.2-ce
+  stage: build_image
+  tags:
+    - docker
+  when: on_success
+  only:
+    - master
+  before_script:
+    - docker info
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID .
+    - docker tag $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID $CI_REGISTRY_IMAGE:latest
+    - docker push $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID
+    - docker push $CI_REGISTRY_IMAGE:latest
+  after_script:
+    - docker rm $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID
+    - docker rm $CI_REGISTRY_IMAGE:latest
