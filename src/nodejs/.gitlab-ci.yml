@@ -16,7 +16,8 @@ build_job:
     - chmod +x build.sh
     - ./build.sh
   artifacts:
-    - $ARTIFACTS
+    paths:
+      - $ARTIFACTS
 
 build_image_job:
   stage: build_image
