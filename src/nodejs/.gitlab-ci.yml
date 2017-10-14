@@ -1,9 +1,12 @@
 variables:
   ARTIFACTS: "."
+  RANCHER_URL: "http://192.168.33.10"
+  GIT_SSL_NO_VERIFY: "1"    # you normally SHOULD NOT do this
 
 stages:
   - build
   - build_image
+  - deploy_prod
 
 build_job:
   stage: build
@@ -32,3 +35,17 @@ build_image_job:
     - docker tag $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID $CI_REGISTRY_IMAGE:latest
     - docker push $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID
     - docker push $CI_REGISTRY_IMAGE:latest
+
+deploy_prod_job:
+  image: cdrx/rancher-gitlab-deploy
+  stage: deploy_prod
+  environment:
+    - name: production
+  tags:
+    - docker
+  only:
+    - master
+  script:
+    - upgrade --new-image $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID --environment production --stack devspace --service TodoApi
+
+

@@ -6,6 +6,7 @@ variables:
 stages:
   - build
   - build_image
+  - deploy_prod
 
 build_job:
   image: microsoft/dotnet:2.0.0-sdk
@@ -20,7 +21,8 @@ build_job:
   artifacts:
     paths:
       - $ARTIFACTS
-      
+
+
 build_image_job:
   image: docker:17.06.2-ce
   stage: build_image
@@ -40,3 +42,16 @@ build_image_job:
   after_script:
     - docker rm $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID
     - docker rm $CI_REGISTRY_IMAGE:latest
+
+    
+deploy_prod_job:
+ image: cdrx/rancher-gitlab-deploy
+ stage: deploy_prod
+ environment: 
+  - name: production
+ tags:
+   - docker
+ only:
+   - master
+ script:
+   - upgrade --new-image $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID --environment production --stack devspace --service TodoApi
